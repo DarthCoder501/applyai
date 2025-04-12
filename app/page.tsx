@@ -48,7 +48,7 @@ export default function LandingPage() {
 
           <SignedIn>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/chat">
+              <Link href="/home">
                 <Button
                   size="lg"
                   className="text-lg px-8 bg-white text-[#6a0dad] hover:bg-gray-100"

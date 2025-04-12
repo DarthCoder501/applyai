@@ -34,6 +34,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
+        <head>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
