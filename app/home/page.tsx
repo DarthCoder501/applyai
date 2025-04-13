@@ -5,6 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from "react-markdown";
+import Link from "next/link";
+import { SignOutButton, SignedIn } from "@clerk/nextjs";
+import { Menu } from "lucide-react";
+
 declare const pdfjsLib: any;
 
 export default function ResumeAnalyzerPage() {
@@ -13,6 +17,7 @@ export default function ResumeAnalyzerPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [score, setScore] = useState<number | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -75,6 +80,45 @@ export default function ResumeAnalyzerPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-[#c10f2f] to-[#6a0dad] dark:from-[#8b0a24] dark:to-[#3d005e] text-white px-4 py-10">
       <div className="text-center max-w-3xl w-full space-y-8">
+        <SignedIn>
+          <div className="absolute top-4 right-4">
+            <div className="relative">
+              <button
+                onClick={() => setMenuOpen((prev) => !prev)}
+                className="p-2 rounded-full bg-white text-[#6a0dad] shadow-lg hover:bg-gray-100 transition"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 flex flex-col bg-white text-[#6a0dad] rounded-lg shadow-lg py-2 min-w-[160px] z-50">
+                  <Link
+                    href="/"
+                    className="px-4 py-2 hover:bg-gray-100 transition whitespace-nowrap"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Landing Page
+                  </Link>
+                  <Link
+                    href="/analytics"
+                    className="px-4 py-2 hover:bg-gray-100 transition whitespace-nowrap"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Analytics
+                  </Link>
+                  <SignOutButton>
+                    <button
+                      className="px-4 py-2  hover:bg-gray-100 w-full transition"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Sign Out
+                    </button>
+                  </SignOutButton>
+                </div>
+              )}
+            </div>
+          </div>
+        </SignedIn>
         <h1 className="text-5xl font-bold drop-shadow-md">Resume Analyzer</h1>
         <p className="text-xl text-white/80">
           Upload your resume and a job description to get instant AI-powered
@@ -97,7 +141,7 @@ export default function ResumeAnalyzerPage() {
             file && handleFileChange({ target: { files: [file] } } as any)
           }
           disabled={!file || !jobDescription || isProcessing}
-          className="mt-4 text-lg px-8 bg-white text-[#c10f2f] hover:bg-gray-100 dark:text-[#c10f2f]"
+          className="mt-4 text-lg px-8 bg-white text-[#6a0dad] hover:bg-gray-100 dark:text-[#6a0dad]"
         >
           {isProcessing ? "Analyzing..." : "Analyze Resume"}
         </Button>
