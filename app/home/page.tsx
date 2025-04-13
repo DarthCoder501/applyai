@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
-import { SignOutButton, SignedIn } from "@clerk/nextjs";
+import { SignOutButton, SignedIn, useUser } from "@clerk/nextjs";
 import { Menu } from "lucide-react";
 
 declare const pdfjsLib: any;
@@ -17,6 +17,7 @@ export default function ResumeAnalyzerPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [score, setScore] = useState<number | null>(null);
+  const [similarity, setSimilarity] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +69,27 @@ export default function ResumeAnalyzerPage() {
       }
 
       const scoreMatch = result.match(/Match Score: (\d+)/);
+      const similarityScore = result.match(
+        /Semantic Similarity Score: ([0-9.]+)/
+      );
+
       if (scoreMatch) setScore(parseInt(scoreMatch[1]));
+      if (similarityScore) setSimilarity(parseFloat(similarityScore[1]));
+
+      const { user } = useUser();
+
+      await fetch("/api/save-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userEmail: user?.primaryEmailAddress?.emailAddress,
+          resumeText,
+          jobDescription,
+          matchScore: score,
+          similarityScore: similarity,
+          feedback,
+        }),
+      });
       setFeedback(result);
     } catch (err) {
       console.error("Error:", err);

@@ -18,6 +18,7 @@ async function initDB() {
       resume_text LONGTEXT,
       job_description TEXT,
       match_score INT,
+      similarity_score FLOAT,
       feedback LONGTEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
