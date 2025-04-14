@@ -19,6 +19,7 @@ export default function ResumeAnalyzerPage() {
   const [score, setScore] = useState<number | null>(null);
   const [similarity, setSimilarity] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useUser();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -75,8 +76,6 @@ export default function ResumeAnalyzerPage() {
 
       if (scoreMatch) setScore(parseInt(scoreMatch[1]));
       if (similarityScore) setSimilarity(parseFloat(similarityScore[1]));
-
-      const { user } = useUser();
 
       await fetch("/api/save-analysis", {
         method: "POST",

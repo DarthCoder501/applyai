@@ -14,8 +14,8 @@ export async function POST(req: Request) {
   try {
     const [result] = await pool.promise().execute(
       `INSERT INTO resume_data (
-          user_email, username, resume_text, job_description, match_score, similarity_score, feedback
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          user_email, resume_text, job_description, match_score, similarity_score, feedback
+        ) VALUES (?, ?, ?, ?, ?, ?)`,
       [
         userEmail,
         resumeText,
