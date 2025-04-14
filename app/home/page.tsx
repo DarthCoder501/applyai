@@ -81,6 +81,7 @@ export default function ResumeAnalyzerPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          userId: user?.id,
           userEmail: user?.primaryEmailAddress?.emailAddress,
           resumeText,
           jobDescription,

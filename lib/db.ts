@@ -7,6 +7,7 @@ export const pool = mysql.createPool({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   connectionLimit: 10,
+  connectTimeout: 10000,
 });
 
 // Creates table
@@ -14,6 +15,7 @@ async function initDB() {
   const createSQLTable = `
     CREATE TABLE IF NOT EXISTS resume_data (
       id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id TEXT,
       user_email TEXT,
       resume_text LONGTEXT,
       job_description TEXT,

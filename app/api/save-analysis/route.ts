@@ -3,6 +3,7 @@ import { pool } from "@/lib/db";
 // Function to save data to AWS RDS MySQL
 export async function POST(req: Request) {
   const {
+    userId,
     userEmail,
     resumeText,
     jobDescription,
@@ -14,9 +15,10 @@ export async function POST(req: Request) {
   try {
     const [result] = await pool.promise().execute(
       `INSERT INTO resume_data (
-          user_email, resume_text, job_description, match_score, similarity_score, feedback
-        ) VALUES (?, ?, ?, ?, ?, ?)`,
+          user_id, user_email, resume_text, job_description, match_score, similarity_score, feedback
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
+        userId,
         userEmail,
         resumeText,
         jobDescription,
