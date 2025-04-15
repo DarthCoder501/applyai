@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   } = await req.json();
 
   try {
-    const [result] = await pool.promise().execute(
+    const [] = await pool.promise().execute(
       `INSERT INTO resume_data (
           user_id, user_email, resume_text, job_description, match_score, similarity_score, feedback
         ) VALUES (?, ?, ?, ?, ?, ?, ?)`,

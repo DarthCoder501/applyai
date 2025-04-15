@@ -2,7 +2,7 @@ import { pool } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 
 // Function to get data of logged-in user
-export async function GET(req: Request) {
+export async function GET() {
   const { userId } = await auth();
 
   if (!userId) {
