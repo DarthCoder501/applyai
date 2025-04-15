@@ -9,7 +9,7 @@ async function uploadFileToS3(file: Buffer, fileName: string) {
   const fileBuffer = file;
 
   const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.BUCKET_NAME,
     Key: `${fileName}`,
     Body: fileBuffer,
     ContentType: "application/pdf",

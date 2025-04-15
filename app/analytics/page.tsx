@@ -14,10 +14,6 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
 } from "recharts";
 
 interface AnalyticsData {
