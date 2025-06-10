@@ -1,31 +1,38 @@
-import { pool } from "@/lib/db";
+import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { docClient, TABLE_NAME } from "@/lib/db";
 
-// Function to save data to AWS RDS MySQL
+// Function to save data to DynamoDB
 export async function POST(req: Request) {
   const {
     userId,
     userEmail,
     resumeText,
     jobDescription,
-    matchScore,
     similarityScore,
     feedback,
   } = await req.json();
-
+  // Log the received data
+  console.log("Received data for saving:", {
+    similarityScore,
+    feedbackLength: feedback?.length,
+  });
   try {
-    const [] = await pool.promise().execute(
-      `INSERT INTO resume_data (
-          user_id, user_email, resume_text, job_description, match_score, similarity_score, feedback
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        userId,
-        userEmail,
-        resumeText,
-        jobDescription,
-        matchScore,
-        similarityScore,
-        feedback,
-      ]
+    const item = {
+      id: `${userId}-${Date.now()}`, // Composite key
+      userId,
+      userEmail,
+      resumeText,
+      jobDescription,
+      similarityScore,
+      feedback,
+      createdAt: new Date().toISOString(),
+    };
+
+    await docClient.send(
+      new PutCommand({
+        TableName: TABLE_NAME,
+        Item: item,
+      })
     );
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });

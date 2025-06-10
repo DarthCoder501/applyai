@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { streamText } from "ai";
+import { generateText } from "ai";
 import { pipeline, dot } from "@huggingface/transformers";
 
 export const POST = async (req: Request) => {
@@ -8,7 +8,9 @@ export const POST = async (req: Request) => {
     const openrouter = createOpenRouter({
       apiKey: process.env.OPENROUTER_KEY!,
     });
+
     const body = await req.json();
+    /*
     const extractor = await pipeline(
       "feature-extraction",
       "Snowflake/snowflake-arctic-embed-m-v2.0",
@@ -29,33 +31,35 @@ export const POST = async (req: Request) => {
     const similarities = document_embeddings.map((x) =>
       dot(source_embeddings, x)
     );
+    */
 
-    const response = await streamText({
-      model: openrouter("google/gemini-flash-1.5-8b-exp"),
-      system: `You are ApplyAI, an intelligent resume assistant that analyzes resumes and job descriptions provided by the user.
+    const result = await generateText({
+      model: openrouter("deepseek/deepseek-r1-distill-qwen-32b:free"),
+      system: `You are ApplyAI, an intelligent resume review assistant. 
 
-Your job is to:
-1. First provide a score from 1-100 indicating how well the resume matches the job description (format: "Match Score: XX/100")
-2. Also include the Semantic Similarity Score: ${similarities}, between the resume and job description as computed by a sentence transformer model (format: Semantic Similarity Score: 0.XX)
-3. Then provide detailed analysis in this exact structure:
+Your job is to provide detailed analysis in this exact structure:
 
-## 🔍 Resume Analysis
-[Your analysis of the resume's strengths and weaknesses]
-
-## 🎯 Job Alignment
-[How well the resume aligns with the job description]
-
-## ✨ Suggested Improvements
-[Specific suggestions for improving the resume]
+Feedback Format (Repeat for Each Bullet Point)
+Section: [Experiences / Projects / etc.] 
+Title: [Role or Project Title]
+Bullet: [Original bullet point text]
+Score: X/10 A number from 1 to 10 indicating the strength of the bullet in terms of clarity, specificity, impact, and alignment with the job.
+Analysis: A concise explanation of what works well and what could be improved. Comment on action verbs, technologies, metrics, and relevance to the job.
+Suggestion: A rewritten version of the bullet that improves specificity, quantification, or relevance. Use strong action verbs, technical terms, and measurable outcomes when possible.
 
 Format rules:
 - Use markdown headings (##, ###)
 - Use bullet points for lists
 - Use \`backticks\` for technical terms
+
+General rules:
 - Be concise but thorough
 - Only analyze the provided materials
-
-`,
+- Repeat the format above for each bullet individually.
+- Be concise but informative. Never generalize — only refer to the given resume and job description.
+- Do not summarize the entire resume — only evaluate the bullet points.
+- Never fabricate achievements; base all suggestions strictly on the original bullet.
+- Be constructive: always include a suggestion for improvement, even for strong bullets.`,
       messages: [
         {
           role: "user",
@@ -64,10 +68,14 @@ Format rules:
       ],
     });
 
-    // Return the clean stream
-    return response.toTextStreamResponse();
+    // Return just the text content
+    return new Response(result.text, {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    });
   } catch (error) {
-    console.error("Error creating response stream:", error);
+    console.error("Error creating response:", error);
     return new Response("Error processing request", { status: 500 });
   }
 };

@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    //const fileName = await uploadFileToS3(buffer, file.name);
+    const fileName = await uploadFileToS3(buffer, file.name);
 
     return NextResponse.json({ sucess: "File is uploaded" });
   } catch (error) {

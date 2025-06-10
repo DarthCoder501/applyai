@@ -16,7 +16,6 @@ export default function ResumeAnalyzerPage() {
   const [jobDescription, setJobDescription] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [score, setScore] = useState<number | null>(null);
   const [similarity, setSimilarity] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useUser();
@@ -44,9 +43,10 @@ export default function ResumeAnalyzerPage() {
     if (!file || !jobDescription) return;
     setIsProcessing(true);
     setFeedback(null);
-    setScore(null);
+    setSimilarity(null);
 
     try {
+      // Upload file to S3
       const formData = new FormData();
       formData.append("file", file);
       await fetch("/api/s3-upload", {
@@ -54,28 +54,25 @@ export default function ResumeAnalyzerPage() {
         body: formData,
       });
 
+      // Get analysis from API
       const response = await fetch("/api", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resume: resumeText, jobDescription }),
       });
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let result = "";
-      while (true) {
-        const { done, value } = await reader!.read();
-        if (done) break;
-        result += decoder.decode(value);
+      //const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Error processing request");
       }
 
-      const scoreMatch = result.match(/Match Score: (\d+)/);
-      const similarityScore = result.match(
-        /Semantic Similarity Score: ([0-9.]+)/
-      );
+      //setSimilarity(data.similarityScore);
+      //setFeedback(data.text);
+      //console.log("FEEDBACK for Markdown rendering:", data.text);
 
-      if (scoreMatch) setScore(parseInt(scoreMatch[1]));
-      if (similarityScore) setSimilarity(parseFloat(similarityScore[1]));
+      const text = await response.text();
+      console.log("API response text:", text);
+      setFeedback(text);
 
       await fetch("/api/save-analysis", {
         method: "POST",
@@ -85,12 +82,10 @@ export default function ResumeAnalyzerPage() {
           userEmail: user?.primaryEmailAddress?.emailAddress,
           resumeText,
           jobDescription,
-          matchScore: score,
-          similarityScore: similarity,
-          feedback,
+          //similarityScore: data.similarityScore,
+          feedback: text,
         }),
       });
-      setFeedback(result);
     } catch (err) {
       console.error("Error:", err);
     } finally {
@@ -167,17 +162,9 @@ export default function ResumeAnalyzerPage() {
           {isProcessing ? "Analyzing..." : "Analyze Resume"}
         </Button>
 
-        {score !== null && (
-          <div className="mt-10 text-3xl font-semibold">
-            Match Score: {score}/100
-          </div>
-        )}
-
-        {feedback && (
-          <div className="mt-6 bg-white/10 p-6 rounded-lg w-full text-left prose prose-invert max-w-4xl">
-            <ReactMarkdown>{feedback}</ReactMarkdown>
-          </div>
-        )}
+        <div className="mt-6 bg-white/10 p-6 rounded-lg w-full text-left prose prose-invert max-w-4xl">
+          <ReactMarkdown>{feedback}</ReactMarkdown>
+        </div>
       </div>
     </div>
   );
