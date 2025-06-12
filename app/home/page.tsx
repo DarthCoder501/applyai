@@ -13,6 +13,8 @@ declare const pdfjsLib: any;
 
 export default function ResumeAnalyzerPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [jobTitle, setJobTitle] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -82,8 +84,10 @@ export default function ResumeAnalyzerPage() {
           userEmail: user?.primaryEmailAddress?.emailAddress,
           resumeText,
           jobDescription,
-          //similarityScore: data.similarityScore,
+          jobTitle,
+          companyName,
           feedback: text,
+          //similarityScore: data.similarityScore,
         }),
       });
     } catch (err) {
@@ -143,6 +147,20 @@ export default function ResumeAnalyzerPage() {
 
         <div className="flex flex-col gap-4">
           <Input type="file" accept=".pdf" onChange={handleFileChange} />
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              value={jobTitle}
+              onChange={(e) => setJobTitle(e.target.value)}
+              placeholder="Job Title"
+              className="text-white"
+            />
+            <Input
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              placeholder="Company Name"
+              className="text-white"
+            />
+          </div>
           <Textarea
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
