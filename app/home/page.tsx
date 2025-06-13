@@ -18,7 +18,7 @@ export default function ResumeAnalyzerPage() {
   const [jobDescription, setJobDescription] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
-  const [similarity, setSimilarity] = useState<number | null>(null);
+  //const [similarity, setSimilarity] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useUser();
 
@@ -45,7 +45,7 @@ export default function ResumeAnalyzerPage() {
     if (!file || !jobDescription) return;
     setIsProcessing(true);
     setFeedback(null);
-    setSimilarity(null);
+    //setSimilarity(null);
 
     try {
       // Upload file to S3
