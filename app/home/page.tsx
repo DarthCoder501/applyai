@@ -126,6 +126,13 @@ export default function ResumeAnalyzerPage() {
                   >
                     Analytics
                   </Link>
+                  <Link
+                    href="/interview"
+                    className="px-4 py-2 hover:bg-gray-100 transition whitespace-nowrap"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Interview
+                  </Link>
                   <SignOutButton>
                     <button
                       className="px-4 py-2  hover:bg-gray-100 w-full transition"

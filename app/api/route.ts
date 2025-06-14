@@ -1,37 +1,12 @@
-import { NextResponse } from "next/server";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { generateText } from "ai";
-import { pipeline, dot } from "@huggingface/transformers";
 
 export const POST = async (req: Request) => {
   try {
     const openrouter = createOpenRouter({
       apiKey: process.env.OPENROUTER_KEY!,
     });
-
     const body = await req.json();
-    /*
-    const extractor = await pipeline(
-      "feature-extraction",
-      "Snowflake/snowflake-arctic-embed-m-v2.0",
-      {
-        dtype: "q8",
-      }
-    );
-
-    const sentences = [body.resume, body.jobDescription];
-
-    const output = await extractor(sentences, {
-      normalize: true,
-      pooling: "cls",
-    });
-
-    // Compute similarity scores
-    const [source_embeddings, ...document_embeddings] = output.tolist();
-    const similarities = document_embeddings.map((x) =>
-      dot(source_embeddings, x)
-    );
-    */
 
     const result = await generateText({
       model: openrouter("deepseek/deepseek-r1-distill-qwen-32b:free"),
