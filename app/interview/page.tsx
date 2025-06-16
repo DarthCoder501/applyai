@@ -13,6 +13,22 @@ export default function InterviewPage() {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Function to gain access to microphone
+  function getLocalStream(): void {
+    navigator.mediaDevices
+      .getUserMedia({ video: false, audio: true })
+      .then((stream: MediaStream) => {
+        (window as any).localStream = stream;
+        (window as any).localAudio.srcObject = stream;
+        (window as any).localAudio.autoplay = true;
+      })
+      .catch((err: Error) => {
+        console.error(`you got an error: ${err}`);
+      });
+  }
+
+  getLocalStream();
+
   return (
     <div className="min-h-screen bg-gradient-to-br  from-[#c10f2f] to-[#6a0dad] dark:from-[#8b0a24] dark:to-[#3d005e] text-white p-8">
       <div className="max-w-3xl mx-auto">
