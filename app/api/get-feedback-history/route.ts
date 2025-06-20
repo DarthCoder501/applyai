@@ -1,19 +1,16 @@
 import { ScanCommand } from "@aws-sdk/lib-dynamodb";
 import { docClient, TABLE_NAME } from "@/lib/db";
-import { useUser } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET(req: Request) {
-  // Check if the user is signed in
-  const { isSignedIn } = useUser();
-  // Get the user id
-  const userId = useUser().user?.id;
-  // If the user is not signed in, return an error
-  if (!isSignedIn) {
+  // Get the user id from Clerk server-side auth
+  const { userId } = await auth();
+  if (!userId) {
     return new Response("Unauthorized", { status: 401 });
   }
 
   try {
-    // Get the feedback history from the database
+    // Get the feedback history from the database for this user
     const result = await docClient.send(
       new ScanCommand({
         TableName: TABLE_NAME,
@@ -25,7 +22,7 @@ export async function GET(req: Request) {
     );
     // Map the feedbacks to the feedbacks array
     const feedbacks =
-      result.Items?.map((item) => ({
+      result.Items?.map((item: any) => ({
         id: item.id,
         jobTitle: item.jobTitle || "Untitled Position",
         companyName: item.companyName || "Unknown Company",
@@ -34,7 +31,7 @@ export async function GET(req: Request) {
       }))
         // Sort the feedbacks by the date they were created
         .sort(
-          (a, b) =>
+          (a: any, b: any) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         ) || [];
 

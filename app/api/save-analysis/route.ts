@@ -10,6 +10,8 @@ export async function POST(req: Request) {
     jobDescription,
     similarityScore,
     feedback,
+    jobTitle,
+    companyName,
   } = await req.json();
   // Log the received data
   console.log("Received data for saving:", {
@@ -25,6 +27,8 @@ export async function POST(req: Request) {
       jobDescription,
       similarityScore,
       feedback,
+      jobTitle,
+      companyName,
       createdAt: new Date().toISOString(),
     };
 
